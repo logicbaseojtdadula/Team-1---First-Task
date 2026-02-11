@@ -1,13 +1,17 @@
 import { useState } from 'react'
 import { useAuth } from '../context/AuthContext'
+import { Link, useLocation } from 'react-router-dom'
 import './Login.css'
 
 function Login() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [rememberMe, setRememberMe] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const { login } = useAuth()
+  const location = useLocation()
+  const successMessage = location.state?.message
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -27,23 +31,31 @@ function Login() {
     <div className="login-container">
       <div className="login-card">
         <div className="login-header">
-          <h1>📋 Task Manager</h1>
-          <p>Team 1 - Project Management System</p>
+          <div className="logo">
+            <svg width="50" height="50" viewBox="0 0 50 50" fill="none">
+              <path d="M25 5L45 15V35L25 45L5 35V15L25 5Z" fill="#1565C0" stroke="#1565C0" strokeWidth="2"/>
+              <path d="M25 15L35 20V30L25 35L15 30V20L25 15Z" fill="white"/>
+            </svg>
+            <div>
+              <h1>STRUCTASK</h1>
+              <p>Structured Task Management</p>
+            </div>
+          </div>
         </div>
 
         <form onSubmit={handleSubmit} className="login-form">
-          <h2>Sign In</h2>
+          <h2>Welcome to Structask</h2>
           
+          {successMessage && <div className="success-message">{successMessage}</div>}
           {error && <div className="error-message">{error}</div>}
 
           <div className="form-group">
-            <label htmlFor="email">Email Address</label>
+            <label htmlFor="email">Email</label>
             <input
               type="email"
               id="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="Enter your email"
               required
               disabled={loading}
             />
@@ -56,38 +68,31 @@ function Login() {
               id="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Enter your password"
               required
               disabled={loading}
             />
           </div>
 
-          <button type="submit" className="btn-login" disabled={loading}>
-            {loading ? 'Signing in...' : 'Sign In'}
-          </button>
-        </form>
-
-        <div className="login-info">
-          <h3>Demo Accounts</h3>
-          <div className="demo-accounts">
-            <div className="demo-account">
-              <strong>Customer</strong>
-              <p>customer@project.com / customer123</p>
-            </div>
-            <div className="demo-account">
-              <strong>Frontend Developer</strong>
-              <p>frontend@project.com / frontend123</p>
-            </div>
-            <div className="demo-account">
-              <strong>Backend Developer</strong>
-              <p>backend@project.com / backend123</p>
-            </div>
-            <div className="demo-account">
-              <strong>Server Admin</strong>
-              <p>server@project.com / server123</p>
-            </div>
+          <div className="form-options">
+            <label className="remember-me">
+              <input
+                type="checkbox"
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+              />
+              Remember Me
+            </label>
           </div>
-        </div>
+
+          <button type="submit" className="btn-login" disabled={loading}>
+            {loading ? 'Signing in...' : 'Login'}
+          </button>
+
+          <div className="form-footer">
+            <a href="#" className="link">Forgot Password?</a>
+            <Link to="/signup" className="link">Sign Up</Link>
+          </div>
+        </form>
       </div>
     </div>
   )

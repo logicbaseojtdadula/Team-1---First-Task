@@ -3,7 +3,7 @@ import axios from 'axios'
 // Change this URL based on your Laravel setup
 // If using Laravel Herd: 'http://backend.test/api'
 // If using php artisan serve: 'http://localhost:8000/api'
-const API_URL = 'http://localhost:8000/api'
+const API_URL = 'http://backend.test/api'
 
 const api = axios.create({
   baseURL: API_URL,
@@ -37,6 +37,7 @@ api.interceptors.response.use(
 
 export const authAPI = {
   login: (credentials) => api.post('/login', credentials),
+  register: (userData) => api.post('/register', userData),
   logout: () => api.post('/logout'),
   getUser: () => api.get('/user'),
 }
