@@ -13,7 +13,12 @@ class ProjectController extends Controller
     {
         $user = $request->user();
 
-        if ($user->role === 'customer') {
+        if ($user->role === 'admin') {
+            // Admin sees all projects
+            $projects = Project::with(['tasks', 'assignments.user', 'customer'])
+                ->orderBy('created_at', 'desc')
+                ->get();
+        } elseif ($user->role === 'customer') {
             // Customer sees their own projects
             $projects = Project::where('customer_id', $user->id)
                 ->with(['tasks', 'assignments.user'])
@@ -33,27 +38,34 @@ class ProjectController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
+            'customer_id' => 'required_if:role,admin|exists:users,id', // Admin must specify customer
         ]);
 
         $user = $request->user();
 
-        // Only customers can create projects
-        if ($user->role !== 'customer') {
-            return response()->json(['message' => 'Only customers can create projects'], 403);
+        // Admin or customer can create projects
+        if ($user->role === 'admin') {
+            // Admin creates project for a customer
+            $customerId = $validated['customer_id'];
+        } elseif ($user->role === 'customer') {
+            // Customer creates their own project
+            $customerId = $user->id;
+        } else {
+            return response()->json(['message' => 'Only customers and admins can create projects'], 403);
         }
 
         // Create project
         $project = Project::create([
             'name' => $validated['name'],
             'description' => $validated['description'],
-            'customer_id' => $user->id,
+            'customer_id' => $customerId,
             'status' => 'active', // Automatically active
         ]);
 
         // Auto-assign developers (round-robin)
         $this->autoAssignDevelopers($project);
 
-        return response()->json($project->load('assignments.user'), 201);
+        return response()->json($project->load('assignments.user', 'customer'), 201);
     }
 
     private function autoAssignDevelopers($project)

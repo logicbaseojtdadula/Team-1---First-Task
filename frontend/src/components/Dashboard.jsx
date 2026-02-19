@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { projectAPI, taskAPI, authAPI } from '../services/api'
 import TaskForm from './TaskForm'
+import AdminDashboard from './AdminDashboard'
 import './Dashboard.css'
 import './DashboardExtras.css'
 
@@ -18,7 +19,7 @@ function Dashboard() {
   const [showProfileMenu, setShowProfileMenu] = useState(false)
   const [showNotifications, setShowNotifications] = useState(false)
   const [showProjectForm, setShowProjectForm] = useState(false)
-  const [newProject, setNewProject] = useState({ name: '', description: '' })
+  const [newProject, setNewProject] = useState({ name: '', description: '', customer_id: '' })
   const [showSubmissionModal, setShowSubmissionModal] = useState(false)
   const [selectedTaskForSubmission, setSelectedTaskForSubmission] = useState(null)
   const [submissionType, setSubmissionType] = useState('link')
@@ -29,11 +30,20 @@ function Dashboard() {
   const [toastMessage, setToastMessage] = useState({ title: '', message: '' })
   const [notifiedTaskIds, setNotifiedTaskIds] = useState(new Set())
   const [notifiedStatusChanges, setNotifiedStatusChanges] = useState(new Map())
+  const [allUsers, setAllUsers] = useState([])
+  const [adminStats, setAdminStats] = useState({})
+
+  // Check if user is admin
+  const isAdmin = user?.role === 'admin'
 
   useEffect(() => {
-    loadProjects()
-    loadTasks()
-  }, [user]) // Reload when user changes
+    if (isAdmin) {
+      loadAdminData()
+    } else {
+      loadProjects()
+      loadTasks()
+    }
+  }, [user, isAdmin]) // Reload when user changes
 
   const loadTasksQuietly = async () => {
     try {
@@ -146,6 +156,47 @@ function Dashboard() {
       setNotifiedStatusChanges(statusMap)
     } catch (error) {
       console.error('Error loading tasks:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const loadAdminData = async () => {
+    try {
+      setLoading(true)
+      // Load all projects for admin
+      const projectsRes = await projectAPI.getAll()
+      setProjects(projectsRes.data)
+      
+      // Load all tasks for admin
+      const tasksRes = await taskAPI.getAll()
+      setTasks(tasksRes.data)
+      
+      // Load all users
+      const usersRes = await fetch('/api/admin/users', {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          'Accept': 'application/json'
+        }
+      })
+      if (usersRes.ok) {
+        const usersData = await usersRes.json()
+        setAllUsers(usersData)
+      }
+      
+      // Load admin stats
+      const statsRes = await fetch('/api/admin/dashboard', {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          'Accept': 'application/json'
+        }
+      })
+      if (statsRes.ok) {
+        const statsData = await statsRes.json()
+        setAdminStats(statsData)
+      }
+    } catch (error) {
+      console.error('Error loading admin data:', error)
     } finally {
       setLoading(false)
     }
@@ -302,6 +353,11 @@ function Dashboard() {
       'completed': 'Completed'
     }
     return <span className={badges[status]}>{labels[status]}</span>
+  }
+
+  // If user is admin, show admin dashboard
+  if (isAdmin) {
+    return <AdminDashboard />
   }
 
   return (

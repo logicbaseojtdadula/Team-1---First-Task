@@ -14,6 +14,7 @@ function AdminDashboard() {
   const [developers, setDevelopers] = useState({ frontend: [], backend: [], server: [] })
   const [showCreateDev, setShowCreateDev] = useState(false)
   const [showAssignModal, setShowAssignModal] = useState(false)
+  const [showCreateProject, setShowCreateProject] = useState(false)
   const [selectedProject, setSelectedProject] = useState(null)
   
   const [newDev, setNewDev] = useState({
@@ -21,6 +22,12 @@ function AdminDashboard() {
     email: '',
     password: '',
     role: 'frontend'
+  })
+
+  const [newProject, setNewProject] = useState({
+    name: '',
+    description: '',
+    customer_id: ''
   })
 
   const [assignment, setAssignment] = useState({
@@ -96,6 +103,23 @@ function AdminDashboard() {
       loadUsers()
     } catch (error) {
       alert(error.response?.data?.message || 'Error creating developer')
+    }
+  }
+
+  const createProject = async (e) => {
+    e.preventDefault()
+    try {
+      const token = localStorage.getItem('token')
+      await axios.post(`${API_URL}/projects`, newProject, {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      alert('Project created successfully!')
+      setNewProject({ name: '', description: '', customer_id: '' })
+      setShowCreateProject(false)
+      loadProjects()
+      loadDashboard()
+    } catch (error) {
+      alert(error.response?.data?.message || 'Error creating project')
     }
   }
 
@@ -249,6 +273,48 @@ function AdminDashboard() {
 
           {activeTab === 'projects' && (
             <div>
+              <button className="btn-primary" onClick={() => setShowCreateProject(true)}>
+                + Create New Project
+              </button>
+
+              {showCreateProject && (
+                <div className="modal">
+                  <div className="modal-content">
+                    <h2>Create New Project</h2>
+                    <form onSubmit={createProject}>
+                      <input
+                        type="text"
+                        placeholder="Project Name"
+                        value={newProject.name}
+                        onChange={(e) => setNewProject({...newProject, name: e.target.value})}
+                        required
+                      />
+                      <textarea
+                        placeholder="Project Description"
+                        value={newProject.description}
+                        onChange={(e) => setNewProject({...newProject, description: e.target.value})}
+                        rows="3"
+                      />
+                      <label>Select Customer</label>
+                      <select 
+                        value={newProject.customer_id} 
+                        onChange={(e) => setNewProject({...newProject, customer_id: e.target.value})}
+                        required
+                      >
+                        <option value="">Select Customer</option>
+                        {users.filter(u => u.role === 'customer').map(c => (
+                          <option key={c.id} value={c.id}>{c.name} ({c.email})</option>
+                        ))}
+                      </select>
+                      <div className="modal-actions">
+                        <button type="submit" className="btn-primary">Create Project</button>
+                        <button type="button" onClick={() => setShowCreateProject(false)}>Cancel</button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              )}
+
               <table className="admin-table">
                 <thead>
                   <tr>

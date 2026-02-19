@@ -12,7 +12,12 @@ class TaskController extends Controller
     {
         $user = $request->user();
 
-        if ($user->role === 'customer') {
+        if ($user->role === 'admin') {
+            // Admin sees all tasks
+            $tasks = Task::with(['project', 'creator'])
+                ->orderBy('created_at', 'desc')
+                ->get();
+        } elseif ($user->role === 'customer') {
             // Customer sees only tasks they created
             $tasks = Task::where('created_by', $user->id)
                 ->with(['project'])

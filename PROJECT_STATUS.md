@@ -13,10 +13,11 @@
 
 ### 👥 Login Credentials
 
-#### Admin Account
+#### Admin Account (NEW!)
 - Email: `admin@structask.com`
 - Password: `admin123`
-- Access: Backend only (no UI dashboard)
+- Features: Full system control, create projects for customers, manage users, assign developers
+- Dashboard: Dedicated admin dashboard with stats and management tools
 
 #### Customer Account
 - Email: `customer@project.com`
