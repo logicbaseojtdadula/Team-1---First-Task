@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Tasks API</title>
+    <style>
+        body { font-family: Arial; padding: 20px; }
+        .task { border: 1px solid #ddd; padding: 10px; margin: 10px 0; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>Test Tasks API</h1>
+    <button onclick="testAPI()">Test Frontend Developer Tasks</button>
+    <div id="result"></div>
+
+    <script>
+        async function testAPI() {
+            const result = document.getElementById('result');
+            result.innerHTML = '<p>Testing...</p>';
+            
+            try {
+                // Step 1: Login as frontend developer
+                const loginRes = await fetch('http://backend.test/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                    body: JSON.stringify({
+                        email: 'frontend@project.com',
+                        password: 'frontend123'
+                    })
+                });
+                
+                const loginData = await loginRes.json();
+                console.log('Login response:', loginData);
+                
+                if (!loginData.token) {
+                    result.innerHTML = '<p style="color:red">Login failed!</p>';
+                    return;
+                }
+                
+                // Step 2: Get tasks
+                const tasksRes = await fetch('http://backend.test/api/tasks', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'Authorization': `Bearer ${loginData.token}`
+                    }
+                });
+                
+                const tasks = await tasksRes.json();
+                console.log('Tasks response:', tasks);
+                
+                // Display results
+                let html = `<h2>✅ Success! Found ${tasks.length} tasks</h2>`;
+                html += `<p><strong>User:</strong> ${loginData.user.name} (${loginData.user.email})</p>`;
+                html += `<h3>Tasks:</h3>`;
+                
+                tasks.forEach((task, index) => {
+                    html += `
+                        <div class="task">
+                            <strong>${index + 1}. ${task.title}</strong><br>
+                            Category: ${task.category}<br>
+                            Status: ${task.status}<br>
+                            Project: ${task.project?.name || 'N/A'}<br>
+                            Created: ${new Date(task.created_at).toLocaleString()}
+                        </div>
+                    `;
+                });
+                
+                result.innerHTML = html;
+                
+            } catch (error) {
+                result.innerHTML = `<p style="color:red">Error: ${error.message}</p>`;
+                console.error('Error:', error);
+            }
+        }
+    </script>
+</body>
+</html>

@@ -13,164 +13,104 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        // Create Users
+        // Create Admin
+        $admin = User::create([
+            'name' => 'System Admin',
+            'email' => 'admin@structask.com',
+            'password' => Hash::make('admin123'),
+            'role' => 'admin',
+            'is_active' => true,
+        ]);
+
+        // Create Customer
         $customer = User::create([
             'name' => 'Customer User',
             'email' => 'customer@project.com',
             'password' => Hash::make('customer123'),
             'role' => 'customer',
+            'is_active' => true,
         ]);
 
-        $frontend = User::create([
-            'name' => 'Frontend Developer',
-            'email' => 'frontend@project.com',
-            'password' => Hash::make('frontend123'),
-            'role' => 'frontend',
-        ]);
+        // Create 5 Frontend Developers
+        $frontendDevs = [];
+        for ($i = 1; $i <= 5; $i++) {
+            $frontendDevs[] = User::create([
+                'name' => "Frontend Developer $i",
+                'email' => "frontend$i@structask.com",
+                'password' => Hash::make('frontend123'),
+                'role' => 'frontend',
+                'created_by' => $admin->id,
+                'is_active' => true,
+            ]);
+        }
 
-        $backend = User::create([
-            'name' => 'Backend Developer',
-            'email' => 'backend@project.com',
-            'password' => Hash::make('backend123'),
-            'role' => 'backend',
-        ]);
+        // Create 5 Backend Developers
+        $backendDevs = [];
+        for ($i = 1; $i <= 5; $i++) {
+            $backendDevs[] = User::create([
+                'name' => "Backend Developer $i",
+                'email' => "backend$i@structask.com",
+                'password' => Hash::make('backend123'),
+                'role' => 'backend',
+                'created_by' => $admin->id,
+                'is_active' => true,
+            ]);
+        }
 
-        $server = User::create([
-            'name' => 'Server Administrator',
-            'email' => 'server@project.com',
-            'password' => Hash::make('server123'),
-            'role' => 'server',
-        ]);
+        // Create 5 Server Administrators
+        $serverAdmins = [];
+        for ($i = 1; $i <= 5; $i++) {
+            $serverAdmins[] = User::create([
+                'name' => "Server Admin $i",
+                'email' => "server$i@structask.com",
+                'password' => Hash::make('server123'),
+                'role' => 'server',
+                'created_by' => $admin->id,
+                'is_active' => true,
+            ]);
+        }
 
-        // Create additional developers for other projects
-        $frontend2 = User::create([
-            'name' => 'Alice Frontend',
-            'email' => 'alice@project.com',
-            'password' => Hash::make('alice123'),
-            'role' => 'frontend',
-        ]);
-
-        $backend2 = User::create([
-            'name' => 'Bob Backend',
-            'email' => 'bob@project.com',
-            'password' => Hash::make('bob123'),
-            'role' => 'backend',
-        ]);
-
-        $server2 = User::create([
-            'name' => 'Charlie Server',
-            'email' => 'charlie@project.com',
-            'password' => Hash::make('charlie123'),
-            'role' => 'server',
-        ]);
-
-        // Create 5 Projects
-        $projects = [];
-        
+        // Create a sample project (status: pending until admin assigns developers)
         $project1 = Project::create([
             'name' => 'E-Commerce Platform',
             'description' => 'Online shopping platform with payment integration',
             'customer_id' => $customer->id,
+            'status' => 'pending',
         ]);
-        $projects[] = $project1;
 
-        $project2 = Project::create([
-            'name' => 'Mobile Banking App',
-            'description' => 'Secure banking application for mobile devices',
-            'customer_id' => $customer->id,
-        ]);
-        $projects[] = $project2;
-
-        $project3 = Project::create([
-            'name' => 'Learning Management System',
-            'description' => 'Educational platform for online courses',
-            'customer_id' => $customer->id,
-        ]);
-        $projects[] = $project3;
-
-        $project4 = Project::create([
-            'name' => 'Healthcare Portal',
-            'description' => 'Patient management and appointment system',
-            'customer_id' => $customer->id,
-        ]);
-        $projects[] = $project4;
-
-        $project5 = Project::create([
-            'name' => 'Real Estate Listing',
-            'description' => 'Property listing and management platform',
-            'customer_id' => $customer->id,
-        ]);
-        $projects[] = $project5;
-
-        // Assign developers to Project 1
+        // Admin assigns developers to Project 1 (you can change these assignments)
         ProjectAssignment::create([
             'project_id' => $project1->id,
-            'user_id' => $frontend->id,
+            'user_id' => $frontendDevs[0]->id, // Frontend Developer 1
             'role' => 'frontend',
         ]);
 
         ProjectAssignment::create([
             'project_id' => $project1->id,
-            'user_id' => $backend->id,
+            'user_id' => $backendDevs[0]->id, // Backend Developer 1
             'role' => 'backend',
         ]);
 
         ProjectAssignment::create([
             'project_id' => $project1->id,
-            'user_id' => $server->id,
+            'user_id' => $serverAdmins[0]->id, // Server Admin 1
             'role' => 'server',
         ]);
 
-        // Assign developers to Project 2
-        ProjectAssignment::create([
-            'project_id' => $project2->id,
-            'user_id' => $frontend2->id,
-            'role' => 'frontend',
-        ]);
+        // Update project status to active
+        $project1->status = 'active';
+        $project1->save();
 
-        ProjectAssignment::create([
-            'project_id' => $project2->id,
-            'user_id' => $backend2->id,
-            'role' => 'backend',
-        ]);
-
-        ProjectAssignment::create([
-            'project_id' => $project2->id,
-            'user_id' => $server2->id,
-            'role' => 'server',
-        ]);
-
-        // Assign same developers to remaining projects (developers can work on multiple projects)
-        foreach ([$project3, $project4, $project5] as $project) {
-            ProjectAssignment::create([
-                'project_id' => $project->id,
-                'user_id' => $frontend->id,
-                'role' => 'frontend',
-            ]);
-
-            ProjectAssignment::create([
-                'project_id' => $project->id,
-                'user_id' => $backend->id,
-                'role' => 'backend',
-            ]);
-
-            ProjectAssignment::create([
-                'project_id' => $project->id,
-                'user_id' => $server->id,
-                'role' => 'server',
-            ]);
-        }
-
-        // Create sample tasks for Project 1
+        // Customer creates tasks (automatically assigned to developers)
         Task::create([
             'project_id' => $project1->id,
             'title' => 'Design product listing page',
             'description' => 'Create responsive product grid with filters',
             'category' => 'frontend',
             'priority' => 'high',
-            'status' => 'completed',
+            'status' => 'pending',
             'created_by' => $customer->id,
-            'assigned_to' => $frontend->id,
+            'assigned_to' => $frontendDevs[0]->id,
         ]);
 
         Task::create([
@@ -179,9 +119,9 @@ class DatabaseSeeder extends Seeder
             'description' => 'Integrate Stripe payment gateway',
             'category' => 'backend',
             'priority' => 'high',
-            'status' => 'in-progress',
+            'status' => 'pending',
             'created_by' => $customer->id,
-            'assigned_to' => $backend->id,
+            'assigned_to' => $backendDevs[0]->id,
         ]);
 
         Task::create([
@@ -192,37 +132,27 @@ class DatabaseSeeder extends Seeder
             'priority' => 'medium',
             'status' => 'pending',
             'created_by' => $customer->id,
-            'assigned_to' => $server->id,
-        ]);
-
-        Task::create([
-            'project_id' => $project1->id,
-            'title' => 'Create shopping cart component',
-            'description' => 'Build interactive cart with add/remove functionality',
-            'category' => 'frontend',
-            'priority' => 'medium',
-            'status' => 'pending',
-            'created_by' => $customer->id,
-            'assigned_to' => $frontend->id,
-        ]);
-
-        // Create tasks for Project 2
-        Task::create([
-            'project_id' => $project2->id,
-            'title' => 'Design login screen',
-            'description' => 'Create modern banking login UI',
-            'category' => 'frontend',
-            'priority' => 'high',
-            'status' => 'completed',
-            'created_by' => $customer->id,
-            'assigned_to' => $frontend2->id,
+            'assigned_to' => $serverAdmins[0]->id,
         ]);
 
         echo "Database seeded successfully!\n\n";
-        echo "Login credentials:\n";
-        echo "Customer: customer@project.com / customer123\n";
-        echo "Frontend: frontend@project.com / frontend123\n";
-        echo "Backend: backend@project.com / backend123\n";
-        echo "Server: server@project.com / server123\n";
+        echo "=== LOGIN CREDENTIALS ===\n";
+        echo "Admin: admin@structask.com / admin123\n\n";
+        echo "Customer: customer@project.com / customer123\n\n";
+        echo "Frontend Developers:\n";
+        for ($i = 1; $i <= 5; $i++) {
+            echo "  frontend$i@structask.com / frontend123\n";
+        }
+        echo "\nBackend Developers:\n";
+        for ($i = 1; $i <= 5; $i++) {
+            echo "  backend$i@structask.com / backend123\n";
+        }
+        echo "\nServer Administrators:\n";
+        for ($i = 1; $i <= 5; $i++) {
+            echo "  server$i@structask.com / server123\n";
+        }
+        echo "\n=== ADMIN INSTRUCTIONS ===\n";
+        echo "As admin, you can assign any developer to any project.\n";
+        echo "Developers don't know which tasks they'll get until they login!\n";
     }
 }

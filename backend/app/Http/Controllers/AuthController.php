@@ -75,4 +75,33 @@ class AuthController extends Controller
     {
         return response()->json($request->user());
     }
+
+    public function uploadProfilePhoto(Request $request)
+    {
+        $request->validate([
+            'photo' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048', // 2MB max
+        ]);
+
+        $user = $request->user();
+
+        // Delete old photo if exists
+        if ($user->profile_photo) {
+            \Storage::disk('public')->delete($user->profile_photo);
+        }
+
+        // Store new photo
+        $file = $request->file('photo');
+        $filename = 'profile_' . $user->id . '_' . time() . '.' . $file->getClientOriginalExtension();
+        $path = $file->storeAs('profiles', $filename, 'public');
+
+        // Update user
+        $user->profile_photo = $path;
+        $user->save();
+
+        return response()->json([
+            'message' => 'Profile photo uploaded successfully',
+            'profile_photo' => $path,
+            'url' => asset('storage/' . $path)
+        ]);
+    }
 }

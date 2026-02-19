@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider, useAuth } from './context/AuthContext'
+import Welcome from './components/Welcome'
 import Login from './components/Login'
 import Signup from './components/Signup'
 import Dashboard from './components/Dashboard'
@@ -17,7 +18,7 @@ function ProtectedRoute({ children }) {
     )
   }
 
-  return user ? children : <Navigate to="/" replace />
+  return user ? children : <Navigate to="/login" replace />
 }
 
 function PublicRoute({ children }) {
@@ -40,7 +41,8 @@ function App() {
     <BrowserRouter>
       <AuthProvider>
         <Routes>
-          <Route path="/" element={
+          <Route path="/" element={<Welcome />} />
+          <Route path="/login" element={
             <PublicRoute>
               <Login />
             </PublicRoute>
@@ -52,7 +54,7 @@ function App() {
           } />
           <Route path="/dashboard" element={
             <ProtectedRoute>
-              <Dashboard />
+              <Dashboard key={Date.now()} />
             </ProtectedRoute>
           } />
         </Routes>

@@ -82,15 +82,20 @@ cd ../frontend
 # Install dependencies
 npm install
 
-# Update API URL in src/services/api.js
-# If using Herd: http://backend.test/api
-# If using artisan serve: http://localhost:8000/api
+# Copy environment file
+cp .env.example .env
+
+# Edit .env and set your API URL:
+# If using Herd: VITE_API_URL=http://backend.test/api
+# If using artisan serve: VITE_API_URL=http://localhost:8000/api
 
 # Start development server
 npm run dev
 ```
 
 Your frontend will be available at: `http://localhost:5174`
+
+**Important:** The frontend connects to the backend via the API URL configured in `frontend/.env`. Make sure it matches your backend setup!
 
 ## Demo Accounts
 

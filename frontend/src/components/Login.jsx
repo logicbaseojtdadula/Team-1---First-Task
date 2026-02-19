@@ -27,6 +27,11 @@ function Login() {
     setLoading(false)
   }
 
+  const handleForgotPassword = (e) => {
+    e.preventDefault()
+    alert('To reset your password, please contact the administrator at admin@structask.com')
+  }
+
   return (
     <div className="login-container">
       <div className="login-card">
@@ -89,7 +94,7 @@ function Login() {
           </button>
 
           <div className="form-footer">
-            <a href="#" className="link">Forgot Password?</a>
+            <a href="#" className="link" onClick={handleForgotPassword}>Forgot Password?</a>
             <Link to="/signup" className="link">Sign Up</Link>
           </div>
         </form>

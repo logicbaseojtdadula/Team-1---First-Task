@@ -124,17 +124,89 @@ class TaskController extends Controller
         $task = Task::findOrFail($id);
         $user = $request->user();
 
-        // Only customers can delete tasks
-        if ($user->role !== 'customer') {
-            return response()->json(['message' => 'Only customers can delete tasks'], 403);
-        }
-
-        if ($task->created_by !== $user->id) {
-            return response()->json(['message' => 'Unauthorized'], 403);
+        // Customers can delete any of their tasks
+        // Developers can only delete completed tasks assigned to them
+        if ($user->role === 'customer') {
+            if ($task->created_by !== $user->id) {
+                return response()->json(['message' => 'Unauthorized'], 403);
+            }
+        } else {
+            // Developer can only delete completed tasks
+            if ($task->assigned_to !== $user->id) {
+                return response()->json(['message' => 'Unauthorized'], 403);
+            }
+            if ($task->status !== 'completed') {
+                return response()->json(['message' => 'Only completed tasks can be deleted'], 403);
+            }
         }
 
         $task->delete();
 
         return response()->json(['message' => 'Task deleted successfully']);
+    }
+
+    public function addSubmission(Request $request, $id)
+    {
+        $task = Task::findOrFail($id);
+        $user = $request->user();
+
+        // Only assigned developer can add submissions
+        if ($task->assigned_to !== $user->id) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        $validated = $request->validate([
+            'type' => 'required|in:file,image,link',
+            'file' => 'required_if:type,file,image|file|max:10240', // 10MB max
+            'link_url' => 'required_if:type,link|url',
+            'description' => 'nullable|string',
+        ]);
+
+        $submission = new \App\Models\TaskSubmission();
+        $submission->task_id = $task->id;
+        $submission->user_id = $user->id;
+        $submission->type = $validated['type'];
+        $submission->description = $validated['description'] ?? null;
+
+        if (in_array($validated['type'], ['file', 'image'])) {
+            $file = $request->file('file');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $path = $file->storeAs('submissions', $filename, 'public');
+            $submission->file_path = $path;
+            $submission->file_name = $file->getClientOriginalName();
+        } else {
+            $submission->link_url = $validated['link_url'];
+        }
+
+        $submission->save();
+
+        return response()->json($submission, 201);
+    }
+
+    public function getSubmissions($id)
+    {
+        $task = Task::findOrFail($id);
+        $submissions = $task->submissions()->with('user')->orderBy('created_at', 'desc')->get();
+        return response()->json($submissions);
+    }
+
+    public function deleteSubmission(Request $request, $taskId, $submissionId)
+    {
+        $submission = \App\Models\TaskSubmission::findOrFail($submissionId);
+        $user = $request->user();
+
+        // Only the user who created the submission can delete it
+        if ($submission->user_id !== $user->id) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        // Delete file if exists
+        if ($submission->file_path) {
+            \Storage::disk('public')->delete($submission->file_path);
+        }
+
+        $submission->delete();
+
+        return response()->json(['message' => 'Submission deleted successfully']);
     }
 }

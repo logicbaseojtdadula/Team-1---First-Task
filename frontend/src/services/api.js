@@ -1,7 +1,10 @@
 import axios from 'axios'
 
-// API URL from environment variable
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api'
+// Change this URL based on your setup:
+// - If using Laravel Herd: 'http://backend.test/api'
+// - If using php artisan serve: 'http://localhost:8000/api'
+// - Or use environment variable: import.meta.env.VITE_API_URL
+const API_URL = import.meta.env.VITE_API_URL || 'http://backend.test/api'
 
 const api = axios.create({
   baseURL: API_URL,
@@ -38,11 +41,15 @@ export const authAPI = {
   register: (userData) => api.post('/register', userData),
   logout: () => api.post('/logout'),
   getUser: () => api.get('/user'),
+  uploadProfilePhoto: (formData) => api.post('/upload-profile-photo', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' }
+  }),
 }
 
 export const projectAPI = {
   getAll: () => api.get('/projects'),
   getOne: (id) => api.get(`/projects/${id}`),
+  create: (data) => api.post('/projects', data),
 }
 
 export const taskAPI = {
@@ -50,6 +57,11 @@ export const taskAPI = {
   create: (data) => api.post('/tasks', data),
   update: (id, data) => api.put(`/tasks/${id}`, data),
   delete: (id) => api.delete(`/tasks/${id}`),
+  addSubmission: (id, formData) => api.post(`/tasks/${id}/submissions`, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' }
+  }),
+  getSubmissions: (id) => api.get(`/tasks/${id}/submissions`),
+  deleteSubmission: (taskId, submissionId) => api.delete(`/tasks/${taskId}/submissions/${submissionId}`),
 }
 
 export default api

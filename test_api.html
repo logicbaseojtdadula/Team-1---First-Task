@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>API Test</title>
+</head>
+<body>
+    <h1>Testing API</h1>
+    <div id="output"></div>
+
+    <script>
+        const output = document.getElementById('output');
+        
+        // Test 1: Login as frontend developer
+        async function testFrontendLogin() {
+            output.innerHTML += '<h2>Test 1: Login as Frontend Developer</h2>';
+            
+            try {
+                const loginResponse = await fetch('http://backend.test/api/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: 'frontend@project.com',
+                        password: 'frontend123'
+                    })
+                });
+                
+                const loginData = await loginResponse.json();
+                output.innerHTML += '<p>✅ Login successful</p>';
+                output.innerHTML += '<pre>' + JSON.stringify(loginData, null, 2) + '</pre>';
+                
+                const token = loginData.token;
+                
+                // Test 2: Get tasks for frontend developer
+                output.innerHTML += '<h2>Test 2: Get Tasks for Frontend Developer</h2>';
+                
+                const tasksResponse = await fetch('http://backend.test/api/tasks', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                const tasksData = await tasksResponse.json();
+                output.innerHTML += '<p>✅ Tasks retrieved: ' + tasksData.length + ' tasks</p>';
+                output.innerHTML += '<pre>' + JSON.stringify(tasksData, null, 2) + '</pre>';
+                
+            } catch (error) {
+                output.innerHTML += '<p>❌ Error: ' + error.message + '</p>';
+            }
+        }
+        
+        // Test 3: Login as customer
+        async function testCustomerLogin() {
+            output.innerHTML += '<h2>Test 3: Login as Customer</h2>';
+            
+            try {
+                const loginResponse = await fetch('http://backend.test/api/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: 'customer@project.com',
+                        password: 'customer123'
+                    })
+                });
+                
+                const loginData = await loginResponse.json();
+                output.innerHTML += '<p>✅ Login successful</p>';
+                
+                const token = loginData.token;
+                
+                // Get tasks for customer
+                output.innerHTML += '<h2>Test 4: Get Tasks for Customer</h2>';
+                
+                const tasksResponse = await fetch('http://backend.test/api/tasks', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                const tasksData = await tasksResponse.json();
+                output.innerHTML += '<p>✅ Tasks retrieved: ' + tasksData.length + ' tasks</p>';
+                output.innerHTML += '<pre>' + JSON.stringify(tasksData, null, 2) + '</pre>';
+                
+            } catch (error) {
+                output.innerHTML += '<p>❌ Error: ' + error.message + '</p>';
+            }
+        }
+        
+        // Run tests
+        testFrontendLogin().then(() => testCustomerLogin());
+    </script>
+</body>
+</html>

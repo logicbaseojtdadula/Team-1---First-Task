@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { taskAPI } from '../services/api'
 import './TaskForm.css'
 
-function TaskForm({ projectId, projects, onTaskCreated }) {
+function TaskForm({ projectId, projects, onTaskCreated, onClose }) {
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [category, setCategory] = useState('frontend')
@@ -54,7 +54,14 @@ function TaskForm({ projectId, projects, onTaskCreated }) {
 
   return (
     <div className="task-form-card">
-      <h2>➕ Create New Task</h2>
+      <div className="task-form-header">
+        <h2>➕ Create New Task</h2>
+        {onClose && (
+          <button className="close-btn" onClick={onClose} type="button">
+            ×
+          </button>
+        )}
+      </div>
       
       {error && <div className="error-message">{error}</div>}
 
@@ -100,16 +107,16 @@ function TaskForm({ projectId, projects, onTaskCreated }) {
         </div>
 
         <div className="form-group">
-          <label>Category *</label>
+          <label>Assign To *</label>
           <select
             value={category}
             onChange={(e) => setCategory(e.target.value)}
             required
             disabled={loading}
           >
-            <option value="frontend">🎨 Frontend</option>
-            <option value="backend">⚙️ Backend</option>
-            <option value="server">🖥️ Server</option>
+            <option value="frontend">🎨 Frontend Developer</option>
+            <option value="backend">⚙️ Backend Developer</option>
+            <option value="server">🖥️ Server Admin</option>
           </select>
           <small className="form-help">
             Task will be automatically assigned to the appropriate developer

@@ -1,7 +1,10 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { authAPI } from '../services/api'
+import { useAuth } from '../context/AuthContext'
+import axios from 'axios'
 import './Signup.css'
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://backend.test/api'
 
 function Signup() {
   const [formData, setFormData] = useState({
@@ -14,6 +17,7 @@ function Signup() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
+  const { login } = useAuth()
 
   const handleChange = (e) => {
     setFormData({
@@ -40,17 +44,28 @@ function Signup() {
     setLoading(true)
 
     try {
-      await authAPI.register({
+      const response = await axios.post(`${API_URL}/register`, {
         name: formData.name,
         email: formData.email,
         password: formData.password,
         role: formData.role
       })
 
-      // Redirect to login page after successful registration
-      navigate('/', { state: { message: 'Registration successful! Please login.' } })
+      // Auto-login after successful registration
+      const loginResult = await login({
+        email: formData.email,
+        password: formData.password
+      })
+
+      if (loginResult.success) {
+        // Redirect to dashboard
+        navigate('/dashboard')
+      } else {
+        // If auto-login fails, redirect to login page
+        navigate('/login', { state: { message: 'Registration successful! Please login.' } })
+      }
     } catch (err) {
-      setError(err.response?.data?.message || 'Registration failed. Please try again.')
+      setError(err.response?.data?.message || err.message || 'Registration failed. Please try again.')
     } finally {
       setLoading(false)
     }
@@ -104,19 +119,11 @@ function Signup() {
           </div>
 
           <div className="form-group">
-            <label htmlFor="role">Role</label>
-            <select
-              id="role"
+            <input
+              type="hidden"
               name="role"
-              value={formData.role}
-              onChange={handleChange}
-              disabled={loading}
-            >
-              <option value="customer">Customer</option>
-              <option value="frontend">Frontend Developer</option>
-              <option value="backend">Backend Developer</option>
-              <option value="server">Server Administrator</option>
-            </select>
+              value="customer"
+            />
           </div>
 
           <div className="form-group">

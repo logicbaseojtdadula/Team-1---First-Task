@@ -22,6 +22,7 @@ class User extends Authenticatable
         'email',
         'password',
         'role', // customer, frontend, backend, server
+        'profile_photo',
     ];
 
     /**
@@ -58,5 +59,10 @@ class User extends Authenticatable
     public function projectAssignments()
     {
         return $this->hasMany(ProjectAssignment::class);
+    }
+
+    public function assignments()
+    {
+        return $this->hasMany(ProjectAssignment::class, 'user_id');
     }
 }

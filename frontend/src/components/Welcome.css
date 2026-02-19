@@ -1,0 +1,271 @@
+.welcome-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #f8f9fa;
+}
+
+.welcome-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header */
+.welcome-header {
+  padding: 24px 48px;
+  background: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.logo-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo-section h1 {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1565C0;
+  margin: 0;
+  letter-spacing: 1px;
+}
+
+/* Hero Section */
+.welcome-content {
+  flex: 1;
+  padding: 60px 48px;
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.hero-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+  align-items: center;
+  margin-bottom: 100px;
+}
+
+.hero-text {
+  max-width: 600px;
+}
+
+.hero-title {
+  font-size: 56px;
+  font-weight: 700;
+  color: #1a202c;
+  margin: 0 0 24px;
+  line-height: 1.2;
+}
+
+.highlight {
+  color: #1565C0;
+  position: relative;
+}
+
+.hero-subtitle {
+  font-size: 20px;
+  color: #4a5568;
+  line-height: 1.6;
+  margin: 0 0 40px;
+}
+
+.hero-buttons {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.btn-primary-large {
+  padding: 16px 32px;
+  background: #1565C0;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(21, 101, 192, 0.3);
+}
+
+.btn-primary-large:hover {
+  background: #0d47a1;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(21, 101, 192, 0.4);
+}
+
+.btn-secondary-large {
+  padding: 16px 32px;
+  background: white;
+  color: #1565C0;
+  border: 2px solid #1565C0;
+  border-radius: 8px;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  transition: all 0.3s ease;
+}
+
+.btn-secondary-large:hover {
+  background: #1565C0;
+  color: white;
+  transform: translateY(-2px);
+}
+
+/* Hero Image */
+.hero-image {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.image-placeholder {
+  width: 100%;
+  max-width: 500px;
+  background: white;
+  border-radius: 16px;
+  padding: 40px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+}
+
+.image-placeholder svg {
+  width: 100%;
+  height: auto;
+}
+
+/* Features Section */
+.features-section {
+  margin-top: 80px;
+}
+
+.features-title {
+  font-size: 36px;
+  font-weight: 700;
+  color: #1a202c;
+  text-align: center;
+  margin: 0 0 48px;
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 32px;
+}
+
+.feature-card {
+  background: white;
+  padding: 32px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+}
+
+.feature-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.feature-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.feature-icon-blue {
+  background: #E3F2FD;
+  color: #1565C0;
+}
+
+.feature-icon-green {
+  background: #E8F5E9;
+  color: #4CAF50;
+}
+
+.feature-icon-purple {
+  background: #F3E5F5;
+  color: #9C27B0;
+}
+
+.feature-card h4 {
+  font-size: 22px;
+  font-weight: 600;
+  color: #1a202c;
+  margin: 0 0 12px;
+}
+
+.feature-card p {
+  font-size: 16px;
+  color: #4a5568;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Footer */
+.welcome-footer {
+  padding: 32px 48px;
+  background: white;
+  border-top: 1px solid #e2e8f0;
+  text-align: center;
+}
+
+.welcome-footer p {
+  margin: 0;
+  color: #718096;
+  font-size: 14px;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .hero-section {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+
+  .hero-title {
+    font-size: 42px;
+  }
+
+  .hero-image {
+    order: -1;
+  }
+}
+
+@media (max-width: 768px) {
+  .welcome-header,
+  .welcome-content,
+  .welcome-footer {
+    padding: 24px;
+  }
+
+  .hero-title {
+    font-size: 36px;
+  }
+
+  .hero-subtitle {
+    font-size: 18px;
+  }
+
+  .features-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .btn-primary-large,
+  .btn-secondary-large {
+    width: 100%;
+    justify-content: center;
+  }
+}
