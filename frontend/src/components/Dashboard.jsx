@@ -18,8 +18,6 @@ function Dashboard() {
   const [showTaskForm, setShowTaskForm] = useState(false)
   const [showProfileMenu, setShowProfileMenu] = useState(false)
   const [showNotifications, setShowNotifications] = useState(false)
-  const [showProjectForm, setShowProjectForm] = useState(false)
-  const [newProject, setNewProject] = useState({ name: '', description: '', customer_id: '' })
   const [showSubmissionModal, setShowSubmissionModal] = useState(false)
   const [selectedTaskForSubmission, setSelectedTaskForSubmission] = useState(null)
   const [submissionType, setSubmissionType] = useState('link')
@@ -239,19 +237,6 @@ function Dashboard() {
       setTasks(tasks.filter(task => task.id !== taskId))
     } catch (error) {
       alert('Error deleting task: ' + (error.response?.data?.message || error.message))
-    }
-  }
-
-  const handleCreateProject = async (e) => {
-    e.preventDefault()
-    try {
-      const response = await projectAPI.create(newProject)
-      setProjects([response.data, ...projects])
-      setShowProjectForm(false)
-      setNewProject({ name: '', description: '' })
-      alert('Project created successfully! Developers have been automatically assigned.')
-    } catch (error) {
-      alert('Error creating project: ' + (error.response?.data?.message || error.message))
     }
   }
 
@@ -621,57 +606,12 @@ function Dashboard() {
                   🔄 Refresh
                 </button>
                 {user.role === 'customer' && (
-                  <>
-                    <button className="btn-primary" onClick={() => setShowTaskForm(!showTaskForm)} style={{ background: '#3B82F6' }}>
-                      + New Task
-                    </button>
-                    <button className="btn-primary" onClick={() => setShowProjectForm(!showProjectForm)} style={{ background: '#22D3EE' }}>
-                      + New Project
-                    </button>
-                  </>
+                  <button className="btn-primary" onClick={() => setShowTaskForm(!showTaskForm)} style={{ background: '#3B82F6' }}>
+                    + New Task
+                  </button>
                 )}
               </div>
             </div>
-
-            {showProjectForm && user.role === 'customer' && (
-              <div className="task-form-modal">
-                <div className="task-form-card">
-                  <div className="task-form-header">
-                    <h3>Create New Project</h3>
-                    <button className="close-btn" onClick={() => setShowProjectForm(false)}>×</button>
-                  </div>
-                  <form onSubmit={handleCreateProject}>
-                    <div className="form-group">
-                      <label>Project Name *</label>
-                      <input
-                        type="text"
-                        value={newProject.name}
-                        onChange={(e) => setNewProject({ ...newProject, name: e.target.value })}
-                        required
-                        placeholder="Enter project name"
-                      />
-                    </div>
-                    <div className="form-group">
-                      <label>Description</label>
-                      <textarea
-                        value={newProject.description}
-                        onChange={(e) => setNewProject({ ...newProject, description: e.target.value })}
-                        rows="4"
-                        placeholder="Enter project description"
-                      />
-                    </div>
-                    <div className="form-actions">
-                      <button type="button" className="btn-secondary" onClick={() => setShowProjectForm(false)}>
-                        Cancel
-                      </button>
-                      <button type="submit" className="btn-primary">
-                        Create Project
-                      </button>
-                    </div>
-                  </form>
-                </div>
-              </div>
-            )}
 
             {showTaskForm && user.role === 'customer' && (
               <div className="task-form-modal">
